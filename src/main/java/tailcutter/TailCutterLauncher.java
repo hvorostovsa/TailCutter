@@ -1,13 +1,9 @@
 package tailcutter;
 
-
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-
-import java.io.IOException;
-
 
 public class TailCutterLauncher {
 
@@ -36,9 +32,7 @@ public class TailCutterLauncher {
             tailCutter.cutFileTail(inputFileNames, outputFileName);
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
+
         }
-
-
-
     }
 }

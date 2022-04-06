@@ -2,6 +2,7 @@ package tailcutter;
 
 import java.io.*;
 import java.util.Scanner;
+import org.apache.commons.io.FileUtils;
 
 public class TailCutter {
 
@@ -24,12 +25,14 @@ public class TailCutter {
                     StringBuilder text = new StringBuilder();
                     BufferedReader inputFile = new BufferedReader(new FileReader(inputFileName));
 
-                    String str;
-                    while ((str = inputFile.readLine()) != null)
-                        text.append(str).append("\n");
-                    text.deleteCharAt(text.length() - 1);
-                    tail.append(this.findTail(text)).append("\n");
-
+                    if (new File(inputFileName).length() == 0) text.append("\n");
+                    else {
+                        String str;
+                        while ((str = inputFile.readLine()) != null)
+                            text.append(str).append("\n");
+                        text.deleteCharAt(text.length() - 1);
+                        tail.append(this.findTail(text)).append("\n");
+                    }
                 } catch (IOException e) {
                     System.err.println(e.getMessage());
                 }

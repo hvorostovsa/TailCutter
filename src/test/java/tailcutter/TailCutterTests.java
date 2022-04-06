@@ -35,8 +35,7 @@ public class TailCutterTests {
         TailCutter tc2 = new TailCutter(5, 0);
         tc2.cutFileTail(new String[] {"files/in2", "files/in3"}, "files/ou");
         assertTrue(assertFileContent("files/ou", """
-                files/in2
-                dfels
+                files/in2              
                 files/in3
                 wf
                 jh"""));
@@ -84,10 +83,10 @@ public class TailCutterTests {
                 a8""" + System.lineSeparator(), outputOut.toString());
 
         // if -c and -n are used together
-        String[] args2 = {"-n", "5", "files/in4", "-c", "5"};
+        String[] args2 = {"-n"};
         TailCutterLauncher.main(args2);
 
-        assertEquals("option \"-c\" cannot be used with the option(s) [-n]" + System.lineSeparator(), outputErr.toString());
+        assertEquals("Option \"-n\" takes an operand" + System.lineSeparator(), outputErr.toString());
 
         System.setOut(oldOut);
         System.setErr(oldErr);
