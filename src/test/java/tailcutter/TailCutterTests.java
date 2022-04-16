@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 public class TailCutterTests {
+    private final String NEW_LINE = System.lineSeparator();
 
     private boolean assertFileContent(String fileName, String expected) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter("files/expected"));
@@ -21,75 +22,59 @@ public class TailCutterTests {
         File file = new File("files/ou");
 
         TailCutter tc1 = new TailCutter(0, 5);
-        tc1.cutFileTail(new String[] {"files/in1"}, "files/ou");
-        assertTrue(assertFileContent("files/ou", """
-                files/in1
-                cd
-                ef
-                gh
-                ij
-                kl"""));
+        tc1.cutTail(new File[]{new File("files/in1")}, new File("files/ou"));
+        assertTrue(assertFileContent("files/ou",
+                "files\\in1" + NEW_LINE +
+                        "cd" + NEW_LINE +
+                        "ef" + NEW_LINE +
+                        "gh" + NEW_LINE +
+                        "ij" + NEW_LINE +
+                        "kl"));
         FileUtils.write(file, "");
 
 
         TailCutter tc2 = new TailCutter(5, 0);
-        tc2.cutFileTail(new String[] {"files/in2", "files/in3"}, "files/ou");
-        assertTrue(assertFileContent("files/ou", """
-                files/in2              
-                files/in3
-                wf
-                jh"""));
+        tc2.cutTail(new File[]{new File("files/in2"), new File("files/in3")}, new File("files/ou"));
+        assertTrue(assertFileContent("files/ou",
+                "files\\in2" + NEW_LINE +
+                        "files\\in3" + NEW_LINE +
+                        "fsefs"));
         FileUtils.write(file, "");
-
-
     }
 
-    @Test
-    public void incorrectFileNameTest() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+    //incorrect file name
+    @Test(expected = IOException.class)
+    public void incorrectFileNameTest() throws IOException {
+        TailCutter tc = new TailCutter(0, 5);
+        tc.cutTail(new File[]{new File("files/in111")}, new File("files/ou"));
+    }
 
-        PrintStream old = System.err;
-        System.setErr(new PrintStream(output));
-
-        TailCutter tc1 = new TailCutter(0, 5);
-        tc1.cutFileTail(new String[] {"files/in111"}, "files/ou");
-        assertEquals("files\\in111 (Не удается найти указанный файл)" + System.lineSeparator(), output.toString());
-
-        System.setErr(old);
-
+    //negative number of lines
+    @Test(expected = IllegalArgumentException.class)
+    public void incorrectParameterValueTest() throws IllegalArgumentException, IOException {
+        TailCutter tc = new TailCutter(0, -5);
+        tc.cutTail(new File[]{new File("files/in1")}, new File("files/ou"));
     }
 
     @Test
     public void consoleTest() {
         ByteArrayOutputStream outputOut = new ByteArrayOutputStream();
-        ByteArrayOutputStream outputErr = new ByteArrayOutputStream();
-
         PrintStream oldOut = System.out;
-        PrintStream oldErr = System.err;
-
         System.setOut(new PrintStream(outputOut));
-        System.setErr(new PrintStream(outputErr));
 
         // everything is fine
         String[] args1 = {"-n", "5", "files/in4"};
         TailCutterLauncher.main(args1);
 
-        assertEquals("""
-                files/in4
-                a4
-                a5
-                a6
-                a7
-                a8""" + System.lineSeparator(), outputOut.toString());
+        assertEquals(
+                "files\\in4" + NEW_LINE +
+                        "a4" + NEW_LINE +
+                        "a5" + NEW_LINE +
+                        "a6" + NEW_LINE +
+                        "a7" + NEW_LINE +
+                        "a8" + NEW_LINE, outputOut.toString());
 
-        // if -c and -n are used together
-        String[] args2 = {"-n"};
-        TailCutterLauncher.main(args2);
-
-        assertEquals("Option \"-n\" takes an operand" + System.lineSeparator(), outputErr.toString());
 
         System.setOut(oldOut);
-        System.setErr(oldErr);
-
     }
 }

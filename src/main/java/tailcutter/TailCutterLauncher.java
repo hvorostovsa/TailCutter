@@ -5,10 +5,13 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import java.io.File;
+import java.io.IOException;
+
 public class TailCutterLauncher {
 
     @Option(name = "-o", usage = "Output file name")
-    private String outputFileName;
+    private File outputFile;
 
     @Option(name = "-c", usage = "Numbers of characters to extract", forbids = {"-n"})
     private int charactersNumber;
@@ -17,7 +20,7 @@ public class TailCutterLauncher {
     private int linesNumber = 10;
 
     @Argument(usage = "Input file names")
-    private String[] inputFileNames;
+    private File[] inputFiles;
 
     public static void main(String[] args) {
         new TailCutterLauncher().launch(args);
@@ -28,11 +31,15 @@ public class TailCutterLauncher {
 
         try {
             parser.parseArgument(args);
-            TailCutter tailCutter = new TailCutter(charactersNumber, linesNumber);
-            tailCutter.cutFileTail(inputFileNames, outputFileName);
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
+        }
 
+        try {
+            TailCutter tailCutter = new TailCutter(charactersNumber, linesNumber);
+            tailCutter.cutTail(inputFiles, outputFile);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
     }
 }
