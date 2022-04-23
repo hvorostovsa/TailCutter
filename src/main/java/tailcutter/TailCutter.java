@@ -1,9 +1,6 @@
 package tailcutter;
 
-import org.apache.commons.io.input.ReversedLinesFileReader;
-
 import java.io.*;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class TailCutter {
@@ -42,9 +39,9 @@ public class TailCutter {
                     if (inputFile.length() == 0 && i != inputFiles.length) text.append(NEW_LINE);
                     else {
                         String str;
-                        while (!Objects.equals(str = reader.readLine(), lastString(inputFile)))
+                        while ((str = reader.readLine()) != null)
                             text.append(str).append(NEW_LINE);
-                        text.append(str);
+                        deleteLastNewLine(text);
 
                         tail.append(this.findTail(text));
                         if (i != inputFiles.length) tail.append(NEW_LINE);
@@ -59,6 +56,7 @@ public class TailCutter {
                 text.append(inputText.nextLine());
                 text.append(NEW_LINE);
             }
+            deleteLastNewLine(text);
             tail.append(this.findTail(text));
         }
         return tail.toString();
@@ -82,8 +80,7 @@ public class TailCutter {
         return text.toString();
     }
 
-    private static String lastString(File file) throws IOException {
-        ReversedLinesFileReader fr = new ReversedLinesFileReader(file);
-        return fr.readLine();
+    private void deleteLastNewLine(StringBuilder sb) {
+        sb.delete(sb.length() - (NEW_LINE.length()), sb.length());
     }
 }
